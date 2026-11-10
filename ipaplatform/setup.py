@@ -25,7 +25,12 @@ import sys
 if __name__ == '__main__':
     # include ../ for ipasetup.py
     sys.path.append(dirname(dirname(abspath(__file__))))
-    from ipasetup import ipasetup  # noqa: E402
+    try:
+        from ipasetup import ipasetup  # noqa: E402
+    except ModuleNotFoundError as exc:
+        if exc.name != 'ipasetup':
+            raise
+        from ipasetup_git import ipasetup  # noqa: E402
 
     ipasetup(
         name="ipaplatform",

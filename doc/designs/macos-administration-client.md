@@ -42,6 +42,33 @@ operations remain unverified.
 
 ## Dependency and configuration setup
 
+### Downstream Git builds
+
+The experimental fork also supports wheel builds from the four package
+subdirectories of a complete Git checkout. If the configured `ipasetup.py`
+is absent, setup falls back to `ipasetup_git.py`, which reuses the original
+setup template and derives development version/API/plugin metadata from
+`VERSION.m4` and `API.txt`. It records the local MIT Kerberos build version
+using `GSSAPI_KRB5CONFIG` (or `krb5-config` from PATH). Installer modules and
+platform overrides are omitted by default, as for administration-only wheels.
+
+These builds use a downstream `+transficc` development version. All four
+distributions must use the same Git revision; installing just `ipaclient`
+from Git would leave its exact-version dependencies unavailable on PyPI.
+Configured upstream builds continue to use their generated `ipasetup.py`.
+This fallback targets direct Git wheel builds, not standalone subdirectory
+source archives or editable installation. It is a downstream integration
+change, separate from the proposed ABI and platform contributions.
+
+With uv, declare all four distributions and supply Git sources with their
+respective `subdirectory` values (`ipaclient`, `ipalib`, `ipaplatform`,
+`ipapython`). A `sys_platform == 'darwin'` source marker limits the fork to
+macOS, and `uv.lock` records the commit resolved from the fork's `master`.
+Other platforms can retain their registry packages. The MIT build/linkage
+requirements below still apply; a Git source entry does not configure GSSAPI.
+
+### Native prerequisites
+
 Use a virtual environment. Native dependencies include Kerberos, OpenLDAP
 (the DN implementation uses libldap even without LDAP administration), and
 the dependencies declared by the four Python packages. This procedure assumes
