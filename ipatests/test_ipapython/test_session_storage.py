@@ -6,10 +6,25 @@
 Test the `session_storage.py` module.
 """
 import ctypes
+import os
+import subprocess
+import sys
 
 import pytest
 
 from ipapython import session_storage
+
+
+def test_session_storage_explicit_library(tmp_path):
+    library = str(tmp_path / 'missing-krb5-library')
+    env = os.environ.copy()
+    env['IPA_KRB5_LIBRARY'] = library
+    result = subprocess.run(
+        [sys.executable, '-c', 'from ipapython import session_storage'],
+        env=env, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert library in result.stderr
 
 
 def test_session_storage_file_cache(tmp_path, monkeypatch):

@@ -97,16 +97,17 @@ components, whose metadata requires matching package versions.
 Launch the Python process with the same MIT library directory used by gssapi:
 
 ```sh
-export DYLD_LIBRARY_PATH=/opt/homebrew/opt/krb5/lib
+export IPA_KRB5_LIBRARY=/opt/homebrew/opt/krb5/lib/libkrb5.dylib
 export IPA_CONFDIR=/absolute/path/to/test-ipa-config
 export KRB5_CONFIG="$IPA_CONFDIR/krb5.conf"
 export KRB5CCNAME="FILE:$IPA_CONFDIR/test.ccache"
 ```
 
-The session-storage loader still uses `libkrb5.dylib`. Verify its actual
-resolved library as well as gssapi linkage. Local checks confirmed MIT via
-`dladdr`; the environment variable alone is not proof. Framework Python or
-protected launchers may handle dynamic-loader variables differently.
+The session-storage loader accepts `IPA_KRB5_LIBRARY` as an explicit library
+path. This survives protected macOS launchers that remove `DYLD_*` variables.
+Without it, the existing platform-specific library name is used. Verify the
+actual resolved library as well as gssapi linkage. Local checks confirmed MIT
+via `dladdr`; a configured path alone is not proof of compatible linkage.
 
 Create `default.conf` in that directory, replacing only the example test-server
 configuration with the isolated realm's values:

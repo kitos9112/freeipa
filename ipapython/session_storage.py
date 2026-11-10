@@ -3,6 +3,7 @@
 #
 
 import ctypes
+import os
 import sys
 
 
@@ -12,6 +13,10 @@ if sys.platform == 'darwin':
     LIBKRB5_FILENAME = 'libkrb5.dylib'
 else:
     LIBKRB5_FILENAME = 'libkrb5.so.3'
+
+# An explicit path keeps ctypes on the same Kerberos implementation as GSSAPI,
+# including when macOS launchers remove dynamic-loader environment variables.
+LIBKRB5_FILENAME = os.environ.get('IPA_KRB5_LIBRARY', LIBKRB5_FILENAME)
 
 try:
     LIBKRB5 = ctypes.CDLL(LIBKRB5_FILENAME)
